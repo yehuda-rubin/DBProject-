@@ -4,7 +4,7 @@ CREATE TABLE Ammunition
   type varchar NOT NULL,
   location_id INT NOT NULL,
   quantity varchar(50) NOT NULL,
-  date_add DATE NOT NULL,
+  date_added DATE NOT NULL,
   PRIMARY KEY (id)
 );
 
@@ -38,7 +38,7 @@ CREATE TABLE Personnel
   id INT NOT NULL,
   name varchar(50) NOT NULL,
   email varchar(50) NOT NULL,
-  phone_number INT NOT NULL,
+  phone_number varchar(50) NOT NULL,
   Role varchar(50) NOT NULL,
   PRIMARY KEY (id)
 );
