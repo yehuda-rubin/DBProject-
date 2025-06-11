@@ -1,0 +1,1045 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+    <meta charset="UTF-8">
+    <title>MIMS - Military Integrated Management System</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.datatables.net/1.13.4/css/jquery.dataTables.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary-blue: #1e3a8a;
+            --secondary-blue: #3b82f6;
+            --dark-gray: #374151;
+            --light-gray: #f3f4f6;
+            --border-gray: #d1d5db;
+            --success-green: #10b981;
+            --warning-orange: #f59e0b;
+            --danger-red: #ef4444;
+            --text-dark: #1f2937;
+            --text-light: #6b7280;
+        }
+
+        body {
+            background: linear-gradient(135deg, #e5e7eb 0%, #f9fafb 100%);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            min-height: 100vh;
+        }
+
+        .main-header {
+            background: linear-gradient(135deg, var(--primary-blue) 0%, var(--secondary-blue) 100%);
+            color: white;
+            padding: 1rem 0;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            margin-bottom: 2rem;
+        }
+
+        .system-logo {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .system-logo i {
+            font-size: 2.5rem;
+            color: #60a5fa;
+        }
+
+        .system-title h1 {
+            font-size: 1.8rem;
+            font-weight: 700;
+            margin: 0;
+            letter-spacing: 1px;
+        }
+
+        .system-subtitle {
+            font-size: 0.9rem;
+            opacity: 0.9;
+            font-weight: 300;
+        }
+
+        .language-toggle {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 0.5rem;
+            transition: all 0.3s ease;
+        }
+
+        .language-toggle:hover {
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+        }
+
+        .sidebar {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            padding: 1.5rem;
+            height: fit-content;
+        }
+
+        .sidebar-section {
+            margin-bottom: 2rem;
+        }
+
+        .sidebar-title {
+            color: var(--primary-blue);
+            font-weight: 600;
+            font-size: 1.1rem;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .table-item, .function-item {
+            border: 1px solid var(--border-gray);
+            border-radius: 8px;
+            padding: 0.75rem;
+            margin-bottom: 0.5rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: white;
+        }
+
+        .table-item:hover, .function-item:hover {
+            background: var(--light-gray);
+            border-color: var(--secondary-blue);
+            transform: translateY(-1px);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .table-icon, .function-icon {
+            display: inline-block;
+            width: 20px;
+            margin-right: 0.5rem;
+            color: var(--secondary-blue);
+        }
+
+        .main-content {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            padding: 2rem;
+        }
+
+        .content-header {
+            display: flex;
+            justify-content: between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 2px solid var(--light-gray);
+        }
+
+        .btn-military {
+            background: var(--secondary-blue);
+            border: none;
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        .btn-military:hover {
+            background: var(--primary-blue);
+            color: white;
+            transform: translateY(-1px);
+        }
+
+        .btn-success-military {
+            background: var(--success-green);
+            border: none;
+            color: white;
+        }
+
+        .btn-success-military:hover {
+            background: #059669;
+            color: white;
+        }
+
+        .btn-warning-military {
+            background: var(--warning-orange);
+            border: none;
+            color: white;
+        }
+
+        .btn-warning-military:hover {
+            background: #d97706;
+            color: white;
+        }
+
+        .btn-danger-military {
+            background: var(--danger-red);
+            border: none;
+            color: white;
+        }
+
+        .btn-danger-military:hover {
+            background: #dc2626;
+            color: white;
+        }
+
+        .modal-header {
+            background: linear-gradient(135deg, var(--primary-blue) 0%, var(--secondary-blue) 100%);
+            color: white;
+            border-radius: 0.375rem 0.375rem 0 0;
+        }
+
+        .modal-header .btn-close {
+            filter: invert(1);
+        }
+
+        .routine-form {
+            background: var(--light-gray);
+            padding: 1.5rem;
+            border-radius: 8px;
+            margin-top: 1rem;
+        }
+
+        .form-control {
+            border: 1px solid var(--border-gray);
+            border-radius: 6px;
+            padding: 0.75rem;
+            transition: border-color 0.3s ease;
+        }
+
+        .form-control:focus {
+            border-color: var(--secondary-blue);
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+
+        .status-indicator {
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            margin-right: 0.5rem;
+        }
+
+        .status-online {
+            background: var(--success-green);
+        }
+
+        .status-offline {
+            background: var(--danger-red);
+        }
+
+        .system-stats {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 1rem;
+            border-radius: 8px;
+            border-left: 4px solid var(--secondary-blue);
+            flex: 1;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .stat-number {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--primary-blue);
+        }
+
+        .stat-label {
+            font-size: 0.875rem;
+            color: var(--text-light);
+        }
+
+        .dataTables_wrapper .dataTables_filter input {
+            border: 1px solid var(--border-gray);
+            border-radius: 6px;
+            padding: 0.5rem;
+        }
+
+        .dataTables_wrapper .dataTables_length select {
+            border: 1px solid var(--border-gray);
+            border-radius: 6px;
+            padding: 0.25rem;
+        }
+
+        table.dataTable thead th {
+            background: var(--light-gray);
+            color: var(--text-dark);
+            font-weight: 600;
+            border-bottom: 2px solid var(--border-gray);
+        }
+
+        .function-description {
+            font-size: 0.875rem;
+            color: var(--text-light);
+            margin-top: 0.25rem;
+        }
+
+        .function-type {
+            display: inline-block;
+            background: var(--secondary-blue);
+            color: white;
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            font-weight: 500;
+            margin-left: 0.5rem;
+        }
+
+        /* RTL Support */
+        .rtl {
+            direction: rtl;
+        }
+
+        .rtl .table-icon, .rtl .function-icon {
+            margin-right: 0;
+            margin-left: 0.5rem;
+        }
+
+        .loading-spinner {
+            display: none;
+            text-align: center;
+            padding: 2rem;
+        }
+
+        .spinner-border-military {
+            border-color: var(--secondary-blue);
+            border-right-color: transparent;
+        }
+
+        .criteria-row {
+            border: 1px solid var(--border-gray);
+            border-radius: 8px;
+            padding: 1rem;
+            margin-bottom: 1rem;
+            background: #f8f9fa;
+        }
+
+        .btn-group-military {
+            gap: 0.5rem;
+        }
+    </style>
+</head>
+<body>
+    <!-- Main Header -->
+    <div class="main-header">
+        <div class="container-fluid">
+            <div class="row align-items-center">
+                <div class="col-md-8">
+                    <div class="system-logo">
+                        <i class="fas fa-shield-alt"></i>
+                        <div class="system-title">
+                            <h1>MIMS</h1>
+                            <div class="system-subtitle" data-en="Military Integrated Management System" data-he="מערכת ניהול צבאית משולבת">Military Integrated Management System</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4 text-end">
+                    <button class="language-toggle btn" onclick="toggleLanguage()">
+                        <i class="fas fa-globe"></i> <span id="lang-text">עברית</span>
+                    </button>
+                    <span class="status-indicator status-online"></span>
+                    <small data-en="System Online" data-he="המערכת פעילה">System Online</small>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="container-fluid">
+        <!-- System Statistics -->
+        <div class="system-stats">
+            <div class="stat-card">
+                <div class="stat-number">{{ tables|length }}</div>
+                <div class="stat-label" data-en="Active Tables" data-he="טבלאות פעילות">Active Tables</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number">{{ functions|length }}</div>
+                <div class="stat-label" data-en="System Functions" data-he="פונקציות מערכת">System Functions</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number">100%</div>
+                <div class="stat-label" data-en="System Availability" data-he="זמינות מערכת">System Availability</div>
+            </div>
+        </div>
+
+        <div class="row">
+            <!-- Sidebar -->
+            <div class="col-md-3">
+                <div class="sidebar">
+                    <!-- Tables Section -->
+                    <div class="sidebar-section">
+                        <h5 class="sidebar-title">
+                            <i class="fas fa-table"></i>
+                            <span data-en="Database Tables" data-he="טבלאות בסיס נתונים">Database Tables</span>
+                        </h5>
+                        <div id="table-list">
+                            {% for table in tables %}
+                                <div class="table-item" data-table="{{ table }}">
+                                    <i class="fas fa-database table-icon"></i>
+                                    <strong>{{ table }}</strong>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Main Content -->
+            <div class="col-md-9">
+                <div class="main-content">
+                    <div class="content-header">
+                        <h5>
+                            <i class="fas fa-cogs"></i>
+                            <span data-en="System Functions & Procedures" data-he="פונקציות ונהלי מערכת">System Functions & Procedures</span>
+                        </h5>
+                    </div>
+
+                    <!-- Functions List -->
+                    <div class="row">
+                        {% for func in functions %}
+                        <div class="col-lg-6 mb-3">
+                            <div class="function-item" data-name="{{ func.name }}" data-type="{{ func.type }}" data-params="{{ func.params | join(',') }}">
+                                <div>
+                                    <i class="fas fa-gear function-icon"></i>
+                                    <strong>{{ func.name }}</strong>
+                                    <span class="function-type">{{ func.type }}</span>
+                                </div>
+                                <div class="function-description">{{ func.desc }}</div>
+                                <div class="function-description">
+                                    <small><strong data-en="Parameters:" data-he="פרמטרים:">Parameters:</strong> {{ func.params | join(', ') }}</small>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+
+                    <!-- Function Execution Form -->
+                    <form id="routine-form" class="routine-form" style="display:none">
+                        <h6 id="routine-title"></h6>
+                        <div id="routine-fields"></div>
+                        <button class="btn btn-military mt-2" type="submit">
+                            <i class="fas fa-play"></i>
+                            <span data-en="Execute" data-he="הפעל">Execute</span>
+                        </button>
+                        <div id="routine-output" class="mt-3"></div>
+                    </form>
+
+                    <!-- Loading Spinner -->
+                    <div class="loading-spinner" id="loading-spinner">
+                        <div class="spinner-border spinner-border-military" role="status">
+                            <span class="visually-hidden">Loading...</span>
+                        </div>
+                        <div class="mt-2" data-en="Processing request..." data-he="מעבד בקשה...">Processing request...</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Table Modal -->
+    <div class="modal fade" id="tableModal" tabindex="-1">
+        <div class="modal-dialog modal-xl">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="tableModalLabel">
+                        <i class="fas fa-table"></i>
+                        <span data-en="Table View" data-he="תצוגת טבלה">Table View</span>
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="d-flex justify-content-between mb-3 btn-group-military">
+                        <div>
+                            <button id="add-row" class="btn btn-success-military">
+                                <i class="fas fa-plus"></i>
+                                <span data-en="Add New Record" data-he="הוסף רשומה חדשה">Add New Record</span>
+                            </button>
+                            <button id="bulk-update" class="btn btn-warning-military">
+                                <i class="fas fa-edit"></i>
+                                <span data-en="Bulk Update" data-he="עדכון מרובה">Bulk Update</span>
+                            </button>
+                            <button id="bulk-delete" class="btn btn-danger-military">
+                                <i class="fas fa-trash-alt"></i>
+                                <span data-en="Bulk Delete" data-he="מחיקה מרובה">Bulk Delete</span>
+                            </button>
+                        </div>
+                        <button class="btn btn-military" onclick="refreshTableData()">
+                            <i class="fas fa-sync"></i>
+                            <span data-en="Refresh" data-he="רענן">Refresh</span>
+                        </button>
+                    </div>
+                    <div id="form-container"></div>
+                    <table id="dynamic-table" class="display" style="width:100%"></table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bulk Update Modal -->
+    <div class="modal fade" id="bulkUpdateModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">
+                        <i class="fas fa-edit"></i>
+                        <span data-en="Bulk Update Records" data-he="עדכון רשומות מרובה">Bulk Update Records</span>
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="bulkUpdateForm">
+                        <h6 data-en="Selection Criteria" data-he="קריטריוני בחירה">Selection Criteria</h6>
+                        <div id="update-criteria-container"></div>
+                        <button type="button" class="btn btn-sm btn-military" onclick="addUpdateCriteria()">
+                            <i class="fas fa-plus"></i> <span data-en="Add Criteria" data-he="הוסף קריטריון">Add Criteria</span>
+                        </button>
+
+                        <hr>
+
+                        <h6 data-en="Fields to Update" data-he="שדות לעדכון">Fields to Update</h6>
+                        <div id="update-fields-container"></div>
+                        <button type="button" class="btn btn-sm btn-success-military" onclick="addUpdateField()">
+                            <i class="fas fa-plus"></i> <span data-en="Add Field" data-he="הוסף שדה">Add Field</span>
+                        </button>
+
+                        <div class="mt-3">
+                            <button type="submit" class="btn btn-warning-military">
+                                <i class="fas fa-save"></i>
+                                <span data-en="Execute Update" data-he="בצע עדכון">Execute Update</span>
+                            </button>
+                        </div>
+                    </form>
+                    <div id="bulk-update-result" class="mt-3"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bulk Delete Modal -->
+    <div class="modal fade" id="bulkDeleteModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">
+                        <i class="fas fa-trash-alt"></i>
+                        <span data-en="Bulk Delete Records" data-he="מחיקת רשומות מרובה">Bulk Delete Records</span>
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="alert alert-danger">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        <strong data-en="Warning:" data-he="אזהרה:">Warning:</strong>
+                        <span data-en="This operation will permanently delete records matching your criteria." data-he="פעולה זו תמחק לצמיתות רשומות המתאימות לקריטריונים שלך.">This operation will permanently delete records matching your criteria.</span>
+                    </div>
+
+                    <form id="bulkDeleteForm">
+                        <h6 data-en="Deletion Criteria" data-he="קריטריוני מחיקה">Deletion Criteria</h6>
+                        <div id="delete-criteria-container"></div>
+                        <button type="button" class="btn btn-sm btn-military" onclick="addDeleteCriteria()">
+                            <i class="fas fa-plus"></i> <span data-en="Add Criteria" data-he="הוסף קריטריון">Add Criteria</span>
+                        </button>
+
+                        <div class="mt-3">
+                            <button type="submit" class="btn btn-danger-military">
+                                <i class="fas fa-trash"></i>
+                                <span data-en="Execute Delete" data-he="בצע מחיקה">Execute Delete</span>
+                            </button>
+                        </div>
+                    </form>
+                    <div id="bulk-delete-result" class="mt-3"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.4/js/jquery.dataTables.min.js"></script>
+
+    <script>
+        let currentTable = '';
+        let currentColumns = [];
+        let primaryKey = '';
+        let currentLanguage = 'en';
+
+        // Language Toggle
+        function toggleLanguage() {
+            currentLanguage = currentLanguage === 'en' ? 'he' : 'en';
+            updateLanguage();
+        }
+
+        function updateLanguage() {
+            const elements = document.querySelectorAll('[data-en][data-he]');
+            elements.forEach(el => {
+                el.textContent = el.getAttribute(`data-${currentLanguage}`);
+            });
+
+            document.getElementById('lang-text').textContent = currentLanguage === 'en' ? 'עברית' : 'English';
+            document.documentElement.dir = currentLanguage === 'he' ? 'rtl' : 'ltr';
+            document.body.className = currentLanguage === 'he' ? 'rtl' : '';
+        }
+
+        function showLoading() {
+            document.getElementById('loading-spinner').style.display = 'block';
+        }
+
+        function hideLoading() {
+            document.getElementById('loading-spinner').style.display = 'none';
+        }
+
+        function refreshTableData() {
+            showLoading();
+            $.getJSON(`/table/${currentTable}`, function(data) {
+                const rowData = data.rows.map(row =>
+                    Object.fromEntries(data.columns.map((c, i) => [c, row[i]]))
+                );
+                const table = $('#dynamic-table').DataTable();
+                table.clear().rows.add(rowData).draw();
+                hideLoading();
+            }).fail(function() {
+                hideLoading();
+                alert('Error loading table data');
+            });
+        }
+
+        function addUpdateCriteria() {
+            const container = $('#update-criteria-container');
+            const criteriaHtml = `
+                <div class="criteria-row">
+                    <div class="row">
+                        <div class="col-md-4">
+                            <select class="form-control criteria-column" name="column">
+                                <option value="">Select Column</option>
+                                ${currentColumns.map(col => `<option value="${col.name}">${col.name}</option>`).join('')}
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <select class="form-control criteria-operator" name="operator">
+                                <option value="=">=</option>
+                                <option value="!=">!=</option>
+                                <option value=">">></option>
+                                <option value="<"><</option>
+                                <option value=">=">>=</option>
+                                <option value="<="><=</option>
+                                <option value="LIKE">LIKE</option>
+                            </select>
+                        </div>
+                        <div class="col-md-4">
+                            <input type="text" class="form-control criteria-value" name="value" placeholder="Value">
+                        </div>
+                        <div class="col-md-1">
+                            <button type="button" class="btn btn-danger-military btn-sm" onclick="$(this).closest('.criteria-row').remove()">
+                                <i class="fas fa-times"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `;
+            container.append(criteriaHtml);
+        }
+
+        function addUpdateField() {
+            const container = $('#update-fields-container');
+            const fieldHtml = `
+                <div class="criteria-row">
+                    <div class="row">
+                        <div class="col-md-5">
+                            <select class="form-control update-column" name="column">
+                                <option value="">Select Column</option>
+                                ${currentColumns.map(col => `<option value="${col.name}">${col.name}</option>`).join('')}
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <input type="text" class="form-control update-value" name="value" placeholder="New Value">
+                        </div>
+                        <div class="col-md-1">
+                            <button type="button" class="btn btn-danger-military btn-sm" onclick="$(this).closest('.criteria-row').remove()">
+                                <i class="fas fa-times"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `;
+            container.append(fieldHtml);
+        }
+
+        function addDeleteCriteria() {
+            const container = $('#delete-criteria-container');
+            const criteriaHtml = `
+                <div class="criteria-row">
+                    <div class="row">
+                        <div class="col-md-4">
+                            <select class="form-control criteria-column" name="column">
+                                <option value="">Select Column</option>
+                                ${currentColumns.map(col => `<option value="${col.name}">${col.name}</option>`).join('')}
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <select class="form-control criteria-operator" name="operator">
+                                <option value="=">=</option>
+                                <option value="!=">!=</option>
+                                <option value=">">></option>
+                                <option value="<"><</option>
+                                <option value=">=">>=</option>
+                                <option value="<="><=</option>
+                                <option value="LIKE">LIKE</option>
+                            </select>
+                        </div>
+                        <div class="col-md-4">
+                            <input type="text" class="form-control criteria-value" name="value" placeholder="Value">
+                        </div>
+                        <div class="col-md-1">
+                            <button type="button" class="btn btn-danger-military btn-sm" onclick="$(this).closest('.criteria-row').remove()">
+                                <i class="fas fa-times"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `;
+            container.append(criteriaHtml);
+        }
+
+        $(function() {
+            // Table click handler
+            $('.table-item').on('click', function () {
+                currentTable = $(this).data('table');
+                $('#form-container').empty();
+                $('#tableModalLabel').html(`<i class="fas fa-table"></i> Table: ${currentTable}`);
+
+                showLoading();
+
+                $.when(
+                    $.getJSON(`/table/${currentTable}`),
+                    $.getJSON(`/table/${currentTable}/columns`),
+                    $.getJSON(`/table/${currentTable}/primary_key`)
+                ).done(function(tableRes, columnsRes, pkRes) {
+                    const data = tableRes[0];
+                    currentColumns = columnsRes[0];
+                    primaryKey = pkRes[0].primary_key;
+                    const isView = !primaryKey;
+
+                    $('#add-row, #bulk-update, #bulk-delete').toggle(!isView);
+
+                    if ($.fn.DataTable.isDataTable('#dynamic-table')) {
+                        $('#dynamic-table').DataTable().destroy();
+                    }
+                    $('#dynamic-table').empty();
+
+                    const columns = data.columns.map(col => ({ title: col, data: col }));
+                    if (!isView) {
+                        columns.push({
+                            title: 'Actions',
+                            data: null,
+                            render: function (data, type, row) {
+                                return `<button class="btn btn-sm btn-warning-military edit-btn"><i class="fas fa-edit"></i></button>
+                                        <button class="btn btn-sm btn-danger-military delete-btn ms-1"><i class="fas fa-trash"></i></button>`;
+                            }
+                        });
+                    }
+
+                    const rowData = data.rows.map(row => Object.fromEntries(data.columns.map((c, i) => [c, row[i]])));
+                    const table = $('#dynamic-table').DataTable({
+                        data: rowData,
+                        columns: columns,
+                        pageLength: 25,
+                        responsive: true,
+                        language: {
+                            search: "Search Records:",
+                            lengthMenu: "Show _MENU_ records per page",
+                            info: "Showing _START_ to _END_ of _TOTAL_ records",
+                            paginate: {
+                                first: "First",
+                                last: "Last",
+                                next: "Next",
+                                previous: "Previous"
+                            }
+                        }
+                    });
+
+                    $('#dynamic-table tbody').off('click');
+
+                    if (!isView) {
+                        $('#dynamic-table tbody').on('click', '.edit-btn', function () {
+                            const rowData = table.row($(this).parents('tr')).data();
+                            const pk = primaryKey;
+                            const pk_val = rowData[pk];
+                            const updates = {};
+                            for (const key in rowData) {
+                                const newVal = prompt(`Update ${key}:`, rowData[key]);
+                                if (newVal !== null && newVal !== rowData[key]) {
+                                    updates[key] = newVal;
+                                }
+                            }
+                            if (Object.keys(updates).length > 0) {
+                                showLoading();
+                                fetch(`/table/${currentTable}/update`, {
+                                    method: 'POST',
+                                    headers: { 'Content-Type': 'application/json' },
+                                    body: JSON.stringify({ pk: pk, pk_val: pk_val, updates: updates })
+                                }).then(res => res.json())
+                                .then(res => {
+                                    hideLoading();
+                                    if (res.error) {
+                                        alert("Error: " + res.error);
+                                    } else {
+                                        refreshTableData();
+                                    }
+                                });
+                            }
+                        });
+
+                        $('#dynamic-table tbody').on('click', '.delete-btn', function () {
+                            const rowData = table.row($(this).parents('tr')).data();
+                            if (confirm('Are you sure you want to delete this record?\n\n' + Object.entries(rowData).map(([k, v]) => `${k} = ${v}`).join('\n'))) {
+                                showLoading();
+                                fetch(`/table/${currentTable}/delete`, {
+                                    method: 'POST',
+                                    headers: { 'Content-Type': 'application/json' },
+                                    body: JSON.stringify({ row: rowData })
+                                }).then(res => res.json())
+                                .then(res => {
+                                    hideLoading();
+                                    if (res.error) {
+                                        alert("Error: " + res.error);
+                                    } else {
+                                        refreshTableData();
+                                    }
+                                });
+                            }
+                        });
+                    }
+
+                    hideLoading();
+                    new bootstrap.Modal(document.getElementById('tableModal')).show();
+                }).fail(function() {
+                    hideLoading();
+                    alert('Error loading table information');
+                });
+            });
+
+            // Add row handler
+            $('#add-row').on('click', function () {
+                let formHtml = '<div class="card"><div class="card-header"><h6><i class="fas fa-plus"></i> Add New Record</h6></div><div class="card-body"><form id="insert-form"><div class="row">';
+                currentColumns.forEach((col, index) => {
+                    formHtml += `<div class="col-md-6 mb-3">
+                        <label class="form-label">${col.name} ${col.nullable ? '' : '<span class="text-danger">*</span>'}</label>
+                        <input class="form-control" name="${col.name}" ${col.nullable ? '' : 'required'}>
+                    </div>`;
+                });
+                formHtml += '</div><button type="submit" class="btn btn-success-military"><i class="fas fa-save"></i> Save Record</button></form></div></div>';
+                $('#form-container').html(formHtml);
+
+                $('#insert-form').on('submit', function (e) {
+                    e.preventDefault();
+                    const formData = {};
+                    $(this).find('input').each(function () {
+                        const value = $(this).val();
+                        if (value !== '') {
+                            formData[$(this).attr('name')] = value;
+                        }
+                    });
+
+                    showLoading();
+                    fetch(`/table/${currentTable}/insert`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(formData)
+                    }).then(res => res.json())
+                    .then(res => {
+                        hideLoading();
+                        if (res.error) {
+                            alert("Error: " + res.error);
+                        } else {
+                            refreshTableData();
+                            $('#form-container').empty();
+                        }
+                    });
+                });
+            });
+
+            // Bulk Update Handler
+            $('#bulk-update').on('click', function () {
+                $('#update-criteria-container, #update-fields-container').empty();
+                $('#bulk-update-result').empty();
+                addUpdateCriteria(); // Add first criteria row
+                addUpdateField(); // Add first update field
+                new bootstrap.Modal(document.getElementById('bulkUpdateModal')).show();
+            });
+
+            $('#bulkUpdateForm').on('submit', function (e) {
+                e.preventDefault();
+
+                const criteria = [];
+                $('#update-criteria-container .criteria-row').each(function () {
+                    const column = $(this).find('.criteria-column').val();
+                    const operator = $(this).find('.criteria-operator').val();
+                    const value = $(this).find('.criteria-value').val();
+
+                    if (column && value && value.trim() !== '') {
+                        criteria.push({ column, operator, value });
+                    }
+                });
+
+                const updates = {};
+                $('#update-fields-container .criteria-row').each(function () {
+                    const column = $(this).find('.update-column').val();
+                    const value = $(this).find('.update-value').val();
+
+                    if (column && value && value.trim() !== '') {
+                        updates[column] = value;
+                    }
+                });
+
+                if (criteria.length === 0) {
+                    alert('Please provide at least one criteria');
+                    return;
+                }
+
+                if (Object.keys(updates).length === 0) {
+                    alert('Please provide at least one field to update');
+                    return;
+                }
+
+                showLoading();
+                fetch(`/table/${currentTable}/update_by_criteria`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ criteria, updates })
+                }).then(res => res.json())
+                .then(res => {
+                    hideLoading();
+                    if (res.error) {
+                        $('#bulk-update-result').html(`<div class="alert alert-danger"><i class="fas fa-exclamation-triangle"></i> ${res.error}</div>`);
+                    } else {
+                        $('#bulk-update-result').html(`<div class="alert alert-success"><i class="fas fa-check"></i> ${res.message}</div>`);
+                        if (res.rows_affected > 0) {
+                            refreshTableData();
+                        }
+                    }
+                }).catch(err => {
+                    hideLoading();
+                    $('#bulk-update-result').html(`<div class="alert alert-danger"><i class="fas fa-exclamation-triangle"></i> Error: ${err.message}</div>`);
+                });
+            });
+
+            // Bulk Delete Handler
+            $('#bulk-delete').on('click', function () {
+                $('#delete-criteria-container').empty();
+                $('#bulk-delete-result').empty();
+                addDeleteCriteria(); // Add first criteria row
+                new bootstrap.Modal(document.getElementById('bulkDeleteModal')).show();
+            });
+
+            $('#bulkDeleteForm').on('submit', function (e) {
+                e.preventDefault();
+
+                const criteria = [];
+                $('#delete-criteria-container .criteria-row').each(function () {
+                    const column = $(this).find('.criteria-column').val();
+                    const operator = $(this).find('.criteria-operator').val();
+                    const value = $(this).find('.criteria-value').val();
+
+                    if (column && value && value.trim() !== '') {
+                        criteria.push({ column, operator, value });
+                    }
+                });
+
+                if (criteria.length === 0) {
+                    alert('Please provide at least one deletion criteria');
+                    return;
+                }
+
+                if (!confirm('Are you sure you want to delete all records matching these criteria? This action cannot be undone.')) {
+                    return;
+                }
+
+                showLoading();
+                fetch(`/table/${currentTable}/delete_by_criteria`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ criteria })
+                }).then(res => res.json())
+                .then(res => {
+                    hideLoading();
+                    if (res.error) {
+                        $('#bulk-delete-result').html(`<div class="alert alert-danger"><i class="fas fa-exclamation-triangle"></i> ${res.error}</div>`);
+                    } else {
+                        $('#bulk-delete-result').html(`<div class="alert alert-success"><i class="fas fa-check"></i> ${res.message}</div>`);
+                        if (res.rows_affected > 0) {
+                            refreshTableData();
+                        }
+                    }
+                }).catch(err => {
+                    hideLoading();
+                    $('#bulk-delete-result').html(`<div class="alert alert-danger"><i class="fas fa-exclamation-triangle"></i> Error: ${err.message}</div>`);
+                });
+            });
+
+            // Function click handler
+            $('.function-item').on('click', function () {
+                const name = $(this).data('name');
+                const type = $(this).data('type');
+                const params = $(this).data('params').split(',').filter(p => p.trim() !== '');
+
+                $('#routine-title').html(`<i class="fas fa-gear"></i> ${type.toUpperCase()}: ${name}`);
+                $('#routine-fields').empty();
+
+                if (params.length > 0) {
+                    let fieldsHtml = '<div class="row">';
+                    params.forEach(p => {
+                        fieldsHtml += `<div class="col-md-6 mb-3">
+                            <label class="form-label">${p.trim()}</label>
+                            <input class="form-control" name="${p.trim()}" required>
+                        </div>`;
+                    });
+                    fieldsHtml += '</div>';
+                    $('#routine-fields').html(fieldsHtml);
+                }
+
+                $('#routine-form').show().data({ name, type });
+                $('#routine-output').empty();
+            });
+
+            // Function form submit
+            $('#routine-form').on('submit', function (e) {
+                e.preventDefault();
+                const name = $(this).data('name');
+                const type = $(this).data('type');
+                const values = {};
+                $(this).find('input').each(function () {
+                    values[$(this).attr('name')] = $(this).val();
+                });
+
+                showLoading();
+                $('#routine-output').empty();
+
+                $.ajax({
+                    url: '/call_function',
+                    method: 'POST',
+                    contentType: 'application/json',
+                    data: JSON.stringify({ name, type, params: values }),
+                    success: function (res) {
+                        hideLoading();
+                        let outputHtml = '<div class="card mt-3"><div class="card-header bg-success text-white"><h6><i class="fas fa-check"></i> Execution Result</h6></div><div class="card-body">';
+                        outputHtml += `<pre class="bg-light p-3 rounded">${JSON.stringify(res, null, 2)}</pre>`;
+                        outputHtml += '</div></div>';
+                        $('#routine-output').html(outputHtml);
+                    },
+                    error: function (xhr) {
+                        hideLoading();
+                        let errorHtml = '<div class="card mt-3"><div class="card-header bg-danger text-white"><h6><i class="fas fa-exclamation-triangle"></i> Execution Error</h6></div><div class="card-body">';
+                        errorHtml += `<pre class="bg-light p-3 rounded">Error: ${xhr.responseText}</pre>`;
+                        errorHtml += '</div></div>';
+                        $('#routine-output').html(errorHtml);
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>
