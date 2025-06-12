@@ -322,6 +322,41 @@
         .btn-group-military {
             gap: 0.5rem;
         }
+
+        .form-control.is-invalid {
+            border-color: var(--danger-red);
+            box-shadow: 0 0 0 0.2rem rgba(239, 68, 68, 0.25);
+        }
+
+        #add-record-form {
+            border-left: 4px solid var(--success-green);
+            margin-bottom: 1rem;
+        }
+
+        #add-record-form .card-header {
+            background: linear-gradient(135deg, var(--success-green) 0%, #059669 100%);
+            color: white;
+        }
+
+        .alert-success {
+            border-left: 4px solid var(--success-green);
+            background: linear-gradient(135deg, rgba(16, 185, 129, 0.1) 0%, rgba(5, 150, 105, 0.1) 100%);
+        }
+
+        .fade-in-up {
+            animation: fadeInUp 0.3s ease-out;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
     </style>
 </head>
 <body>
@@ -592,6 +627,12 @@
             document.getElementById('loading-spinner').style.display = 'none';
         }
 
+        function closeAddForm() {
+            $('#form-container').fadeOut(300, function() {
+                $(this).empty().show();
+            });
+        }
+
         function refreshTableData() {
             showLoading();
             $.getJSON(`/table/${currentTable}`, function(data) {
@@ -824,25 +865,56 @@
 
             // Add row handler
             $('#add-row').on('click', function () {
-                let formHtml = '<div class="card"><div class="card-header"><h6><i class="fas fa-plus"></i> Add New Record</h6></div><div class="card-body"><form id="insert-form"><div class="row">';
+                // Check if form already exists
+                if ($('#add-record-form').length > 0) {
+                    // If form exists, just scroll to it
+                    $('#add-record-form')[0].scrollIntoView({ behavior: 'smooth' });
+                    return;
+                }
+
+                let formHtml = '<div class="card" id="add-record-form"><div class="card-header d-flex justify-content-between align-items-center"><h6><i class="fas fa-plus"></i> Add New Record</h6><button type="button" class="btn btn-sm btn-outline-secondary" onclick="closeAddForm()"><i class="fas fa-times"></i> Close</button></div><div class="card-body"><form id="insert-form"><div class="row">';
                 currentColumns.forEach((col, index) => {
                     formHtml += `<div class="col-md-6 mb-3">
                         <label class="form-label">${col.name} ${col.nullable ? '' : '<span class="text-danger">*</span>'}</label>
                         <input class="form-control" name="${col.name}" ${col.nullable ? '' : 'required'}>
                     </div>`;
                 });
-                formHtml += '</div><button type="submit" class="btn btn-success-military"><i class="fas fa-save"></i> Save Record</button></form></div></div>';
+                formHtml += '</div><div class="d-flex gap-2"><button type="submit" class="btn btn-success-military"><i class="fas fa-save"></i> Save Record</button><button type="button" class="btn btn-secondary" onclick="closeAddForm()"><i class="fas fa-times"></i> Cancel</button></div></form></div></div>';
+
                 $('#form-container').html(formHtml);
+
+                // Animate form appearance
+                $('#add-record-form').hide().slideDown(300);
+
+                // Scroll to form
+                setTimeout(() => {
+                    $('#add-record-form')[0].scrollIntoView({ behavior: 'smooth' });
+                }, 350);
 
                 $('#insert-form').on('submit', function (e) {
                     e.preventDefault();
                     const formData = {};
+                    let hasRequiredFields = true;
+
                     $(this).find('input').each(function () {
                         const value = $(this).val();
-                        if (value !== '') {
-                            formData[$(this).attr('name')] = value;
+                        const isRequired = $(this).prop('required');
+
+                        if (isRequired && (!value || value.trim() === '')) {
+                            hasRequiredFields = false;
+                            $(this).addClass('is-invalid');
+                        } else {
+                            $(this).removeClass('is-invalid');
+                            if (value !== '') {
+                                formData[$(this).attr('name')] = value;
+                            }
                         }
                     });
+
+                    if (!hasRequiredFields) {
+                        alert('Please fill in all required fields (marked with *)');
+                        return;
+                    }
 
                     showLoading();
                     fetch(`/table/${currentTable}/insert`, {
@@ -855,9 +927,25 @@
                         if (res.error) {
                             alert("Error: " + res.error);
                         } else {
+                            // Show success message
+                            const successMsg = `<div class="alert alert-success alert-dismissible fade show" role="alert">
+                                <i class="fas fa-check-circle"></i> <strong>Success!</strong> Record added successfully!
+                                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                            </div>`;
+                            $('#form-container').html(successMsg);
+
+                            // Close the form after 3 seconds
+                            setTimeout(() => {
+                                $('#form-container').fadeOut(300, function() {
+                                    $(this).empty().show();
+                                });
+                            }, 3000);
+
                             refreshTableData();
-                            $('#form-container').empty();
                         }
+                    }).catch(err => {
+                        hideLoading();
+                        alert("Network error: " + err.message);
                     });
                 });
             });
